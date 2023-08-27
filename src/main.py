@@ -2,7 +2,8 @@ import argparse
 import os
 import sys
 from dotenv import load_dotenv
-from streamlit.web import cli as stcli
+from streamlit import cli as stcli
+import streamlit as st
 from utils.process import process
 
 # Load environment variables from a .env file (containing OPENAI_API_KEY)
@@ -66,18 +67,7 @@ def main():
 
     # Process subcommand
     process_parser = subparsers.add_parser("process", help="Process a git repository")
-    process_parser.add_argument(
-        "--repo-url", required=True, help="The git repository URL"
-    )
-    process_parser.add_argument(
-        "--include-file-extensions",
-        nargs="+",
-        default=None,
-        help=(
-            "Exclude all files not matching these extensions. Example:"
-            " --include-file-extensions .py .js .ts .html .css .md .txt"
-        ),
-    )
+
     process_parser.add_argument(
         "--activeloop-dataset-name",
         help=(
@@ -101,6 +91,11 @@ def main():
     args = parser.parse_args()
 
     if args.command == "process":
+        args.repo_url = st.text_input("Please enter the GitHub repository URL:")
+        args.include_file_extensions = st.multiselect(
+            "Include file extensions:",
+            [".py", ".js", ".ts", ".html", ".css", ".md", ".txt"],
+        )
         process_repo(args)
     elif args.command == "chat":
         chat(args)
